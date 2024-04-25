@@ -48,9 +48,153 @@ Loading MavenMarket_Returns CSV file
 
 loading MavenMarket_Transaction CSV File
 
+
 1. Added a new folder named "MavenMarket Transactions", containing both the MavenMarket_Transactions_1997 and MavenMarket_Transactions_1998 csv files
 2. Connected to the folder path, and choose Combine $ Transform.
 3. Click the "Content" column header (double arrow icon) to combine the files, then remove the "Source.Name" column
 4. Named the table "Transaction_Data", and confirmed that headers have been promoted
 5. Confirmed that data types are accurate (all ID columns and quantity should be whole numbers)
 
+
+PART II - Creating the Data Model
+
+1. Connected Transaction_Data to Customers, Products, and Stores using valid primary/foreign keys 
+2. Connected Transaction_Data to Calendar using both date fields, with an inactive "stock_date" relationship
+3. Connected Return_Data to Products, Calendar, and Stores using valid primary/foreign keys
+4. Connected Stores to Regions as a "snowflake" schema
+5. Confirmed all relationships follow one-to-many cardinality, with primary keys (1) on the lookup side and foreign keys (*) on the data side.
+6. Updated all date fields (across all tables) to the "M/d/yyyy" format using the formatting tools in the Modeling tab
+7. Updated "product_retail_price", "product_cost", and "discount_price" to Currency ($ English) format
+8. In the Customers table, categorized "customer_city" as City, "customer_postal_code" as Postal Code, and "customer_country" as Country/Region
+9. In the Stores table, categorized "store_city" as City, "store_state" as State or Province, "store_country" as Country/Region, and "full_address" as Address 
+
+
+PART III - Adding DAX Measures
+
+1. In the Calendar table, add a column named "Weekend"
+   Equals "Y" for Saturdays or Sundays (otherwise "N")
+
+   Weekend = IF('Calendar'[Day Name] = "Saturday" || 'Calendar'[Day Name] = "Sunday", "Y", "N")
+   
+2. In the Calendar table, add a column named "End of Month"
+   Returns the last date of the current month for each row
+
+   End of Month = EOMONTH('Calendar'[Date], 0)
+
+3. In the Customers table, add a column named "Current Age"
+   Calculates current customer ages using the "birthdate" column and the TODAY() function
+
+   Current Age = 
+    DATEDIFF('Customers'[birthdate], TODAY(), YEAR)
+
+4. In the Customers table, add a column named "Priority"
+   Equals "High" for customers who own homes and have Golden membership cards (otherwise "Standard")
+
+   Priority = IF('Customers'[homeowner]= "Y" && 'Customers'[member_card] = "Golden", "High", "Standard")
+
+5. In the Customers table, add a column named "Short_Country"
+   Returns the first three characters of the customer country, and converts to all uppercase
+
+   Short_Country = UPPER(LEFT('Customers'[customer_country], 3))
+
+6. In the Customers table, add a column named "House Number"
+   Extract all characters/numbers before the first space in the "customer_address" column
+
+   House Number = LEFT('Customers'[customer_address], FIND(" ", 'Customers'[customer_address]) - 1)
+
+7. In the Products table, add a column named "Price_Tier"
+   Equals "High" if the retail price is >$3, "Mid" if the retail price is >$1, and "Low" otherwise
+
+   Price_Tier = IF('Products'[product_retail_price]> 3, "High",
+        IF('Products'[product_retail_price] > 1, "Mid", "Low"))
+
+8. In the Stores table, add a column named "Years_Since_Remodel"
+   Calculate the number of years between the current date (TODAY()) and the last remodel date
+
+   Years_Since_Remodel = DATEDIFF('Stores'[last_remodel_date], TODAY(), YEAR)
+
+In the REPORT view, add the following measures:
+
+1. Create new measures named "Quantity Sold" and "Quantity Returned" to calculate the sum of quantity from each data table
+
+   Quantity Sold = SUM('Sales'[quantity])
+   Quantity Returned = SUM('Returns'[quantity])
+
+2. Create new measures named "Total Transactions" and "Total Returns" to calculate the count of rows from each data table
+
+   Total Transactions = COUNTROWS('Transaction_Data')
+   Total Returns = COUNTROWS('Returns')
+   
+3. Create a new measure named "Return Rate" to calculate the ratio of quantity returned to quantity sold (format as %)
+
+   Return Rate = 
+   DIVIDE(
+    [Quantity Returned], 
+    [Quantity Sold],
+    0
+   ) * 100
+
+4. Create a new measure named "Weekend Transactions" to calculate transactions on weekends
+
+   Weekend Transactions = 
+   CALCULATE(
+    [Total Transactions],
+    FILTER(
+        'Calendar',
+        'Calendar'[Day Name] = "Saturday" || 'Calendar'[Day Name] = "Sunday"
+    )
+   )
+
+5. Create a new measure named "% Weekend Transactions" to calculate weekend transactions as a percentage of total transactions (format as %)
+
+   % Weekend Transactions = 
+   DIVIDE(
+    [Weekend Transactions],
+    [Total Transactions],
+    0
+   ) * 100
+
+6. Create a new measure to calculate "Total Revenue" based on transaction quantity and product retail price
+
+   Total Revenue = 
+   SUMX(
+    'Transaction_data',
+    'Transaction_data'[Quantity] * RELATED('Products'[product_retail_price])
+   )
+
+7. Create a new measure to calculate "Total Cost" based on transaction quantity and product cost
+
+   Total Cost = SUMX('Transaction_data', 'Transaction_Data'[quantity] * RELATED('Products'[product_cost]))
+
+8. Create a new measure named "Total Profit" to calculate total revenue minus total cost,
+
+   Total Profit = [Total Revenue] - [Total Cost]
+
+9. Create a new measure to calculate "Profit Margin" by dividing total profit by total revenue calculate total revenue
+
+    Profit Margin = DIVIDE([Total Profit], [Total Revenue])
+
+10. Create a new measure named "Unique Products" to calculate the number of unique product names in the Products table
+
+     Unique Products = DISTINCTCOUNT('Products'[product_name])
+    
+12. Create a new measure named "YTD Revenue" to calculate year-to-date total revenue
+
+   YTD Revenue = TOTALYTD([Total Revenue], 'Calendar'[date])
+
+13. Create a new measure named "60-Day Revenue" to calculate a running revenue total over a 60-day period
+
+    60-Day Revenue = TOTALMTD([Total Revenue], DATEADD('Calendar'[date], -59, DAY))
+
+14. Create new measures named  "Last Month Transactions", "Last Month Revenue", "Last Month Profit", and "Last Month Returns"
+
+    Last Month Transactions = CALCULATE([Total Transactions], PREVIOUSMONTH('Calendar'[date]))
+    Last Month Revenue = CALCULATE([Total Revenue], PREVIOUSMONTH('Calendar'[date]))
+    Last Month Profit = CALCULATE([Total Profit], PREVIOUSMONTH('Calendar'[date]))
+    Last Month Returns = CALCULATE([Total Returns], PREVIOUSMONTH('Calendar'[date]))
+
+15. Create a new measure named "Revenue Target" based on a 5% lift over the previous month revenue
+
+   Revenue Target = [Last Month Revenue] * 1.05
+
+    
