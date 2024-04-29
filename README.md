@@ -1,4 +1,16 @@
 # Maven-Market-Analysis-
+
+**INTRODUCTION:** 
+
+Maven Market Analysis is a comprehensive Power BI project designed to provide insightful analysis and visualization of sales data. With a dataset comprising **10,281 records** across seven different tables, including Calendar, Customers, Products, Regions, Return Data, Stores, and Transaction Data, this project offers a robust foundation for understanding sales performance.
+
+**PROJECT WORKFLOW:**
+The project workflow encompasses several key steps.
+1. It begins with connecting to the data source and shaping the data to ensure its suitability for analysis.
+2. Subsequently, a data model is created to facilitate efficient querying and visualization.
+3. **DAX** measures are then added to calculate important key performance indicators **(KPIs)**, such as current and previous month transactions, profits, and returns.
+
+**STEPS PERFORMED**
 PART I - Connecting and Shaping Data
 
 Loading MavenMarket_Customers CSV file 
@@ -197,4 +209,11 @@ In the REPORT view, add the following measures:
 
    Revenue Target = [Last Month Revenue] * 1.05
 
+**Key Takeaway**
+1. Current Month's Transaction is **5.69%** more than the Previous Month's Transaction.
+2. Current Month's Profit is **5.61%** more than the Previous Month's Profit.
+3. Current Month's Returns is **2.9%** less than the Previous Month's Returns.
+4. The USA has the highest transaction of $83,986.
+5. The store has crossed the revenue target of **$1,19,477** by generating a Total Revenue of **$1,20,161**.
+6. Hermanos Product brand has brought the highest Total Transaction of **$5,542** and the highest profit of **$21,753**. Carrington has the lowest Return rate of **0.78%**.
     
