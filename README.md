@@ -1,7 +1,12 @@
-# Maven-Market-Analysis
+# Maven-Market-Analysis 
+
+**DASHBOARD**
 
 ![Dashboard](https://github.com/micky-26/Maven-Market-Analysis-/assets/106061980/ffb43ad6-1480-4e6f-998d-87613ef6fe05)
 
+**DATA MODEL**
+
+![Data_Model](https://github.com/micky-26/Maven-Market-Analysis-/assets/106061980/7cc2808b-c710-4155-8267-7833d60b6338)
 
 ***INTRODUCTION:*** 
 
