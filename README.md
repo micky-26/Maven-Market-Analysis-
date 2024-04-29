@@ -1,17 +1,21 @@
-# Maven-Market-Analysis-
+# Maven-Market-Analysis
 
-**INTRODUCTION:** 
+![Dashboard](https://github.com/micky-26/Maven-Market-Analysis-/assets/106061980/ffb43ad6-1480-4e6f-998d-87613ef6fe05)
+
+
+***INTRODUCTION:*** 
 
 Maven Market Analysis is a comprehensive Power BI project designed to provide insightful analysis and visualization of sales data. With a dataset comprising **10,281 records** across seven different tables, including Calendar, Customers, Products, Regions, Return Data, Stores, and Transaction Data, this project offers a robust foundation for understanding sales performance.
 
-**PROJECT WORKFLOW:**
+***PROJECT WORKFLOW:***
 The project workflow encompasses several key steps.
 1. It begins with connecting to the data source and shaping the data to ensure its suitability for analysis.
 2. Subsequently, a data model is created to facilitate efficient querying and visualization.
 3. **DAX** measures are then added to calculate important key performance indicators **(KPIs)**, such as current and previous month transactions, profits, and returns.
 
-**STEPS PERFORMED**
-PART I - Connecting and Shaping Data
+***STEPS PERFORMED***
+
+**PART I - Connecting and Shaping Data**
 
 Loading MavenMarket_Customers CSV file 
 
@@ -68,7 +72,7 @@ loading MavenMarket_Transaction CSV File
 5. Confirmed that data types are accurate (all ID columns and quantity should be whole numbers)
 
 
-PART II - Creating the Data Model
+**PART II - Creating the Data Model**
 
 1. Connected Transaction_Data to Customers, Products, and Stores using valid primary/foreign keys 
 2. Connected Transaction_Data to Calendar using both date fields, with an inactive "stock_date" relationship
@@ -81,7 +85,7 @@ PART II - Creating the Data Model
 9. In the Stores table, categorized "store_city" as City, "store_state" as State or Province, "store_country" as Country/Region, and "full_address" as Address 
 
 
-PART III - Adding DAX Measures
+**PART III - Adding DAX Measures**
 
 1. In the Calendar table, add a column named "Weekend"
    Equals "Y" for Saturdays or Sundays (otherwise "N")
@@ -209,7 +213,7 @@ In the REPORT view, add the following measures:
 
    Revenue Target = [Last Month Revenue] * 1.05
 
-**Key Takeaway**
+***Key Takeaway***
 1. Current Month's Transaction is **5.69%** more than the Previous Month's Transaction.
 2. Current Month's Profit is **5.61%** more than the Previous Month's Profit.
 3. Current Month's Returns is **2.9%** less than the Previous Month's Returns.
